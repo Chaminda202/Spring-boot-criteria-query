@@ -33,16 +33,16 @@ class EmployeeCustomRepositoryImplTest {
     void testSaveMultipleEntities() {
         // Setup
         Employee employee1 = Employee.builder()
-                .name("James")
+                .name("Tan James")
                 .email("james@gmail.com")
                 .dob(LocalDate.of(1995, 1, 1))
                 .salary(new BigDecimal("200.00"))
                 .build();
 
         Employee employee2 = Employee.builder()
-                .name("Tony")
-                .email("tony@gmail.com")
-                .dob(LocalDate.of(1992, 1, 1))
+                .name("Taniya Hil")
+                .email("taniya@gmail.com")
+                .dob(LocalDate.of(1996, 1, 1))
                 .salary(new BigDecimal("250.00"))
                 .build();
 
@@ -118,7 +118,7 @@ class EmployeeCustomRepositoryImplTest {
     @Order(2)
     void testAll() {
         Employee employee = Employee.builder()
-                .name("James")
+                .name("Tan James")
                 .email("james@gmail.com")
                 .dob(LocalDate.of(1995, 1, 1))
                 .salary(new BigDecimal("200.00"))
@@ -150,7 +150,7 @@ class EmployeeCustomRepositoryImplTest {
     @Order(3)
     void testSelectEntityFulfillingConditions() {
         Employee employee = Employee.builder()
-                .name("James")
+                .name("Tan James")
                 .email("james@gmail.com")
                 .dob(LocalDate.of(1995, 1, 1))
                 .salary(new BigDecimal("200.00"))
@@ -198,7 +198,7 @@ class EmployeeCustomRepositoryImplTest {
     @Order(4)
     void testJoinQuery() {
         Employee employee = Employee.builder()
-                .name("James")
+                .name("Tan James")
                 .email("james@gmail.com")
                 .dob(LocalDate.of(1995, 1, 1))
                 .salary(new BigDecimal("200.00"))
@@ -241,7 +241,7 @@ class EmployeeCustomRepositoryImplTest {
     @Order(5)
     void testEagerFetchInQuery() {
         Employee employee = Employee.builder()
-                .name("James")
+                .name("Tan James")
                 .email("james@gmail.com")
                 .dob(LocalDate.of(1995, 1, 1))
                 .salary(new BigDecimal("200.00"))
@@ -278,5 +278,65 @@ class EmployeeCustomRepositoryImplTest {
         assertEquals(employee.getDob(), phoneList.get(0).getEmployee().getDob());
         assertEquals(employee.getSalary(), phoneList.get(0).getEmployee().getSalary());
         assertNotNull(phoneList.get(0).getCalls());
+    }
+
+    @Test
+    @Order(6)
+    void testParameterizedQuery() {
+        Employee employee1 = Employee.builder()
+                .name("Tan James")
+                .email("james@gmail.com")
+                .dob(LocalDate.of(1995, 1, 1))
+                .salary(new BigDecimal("200.00"))
+                .build();
+
+        Employee employee2 = Employee.builder()
+                .name("Taniya Hil")
+                .email("taniya@gmail.com")
+                .dob(LocalDate.of(1996, 1, 1))
+                .salary(new BigDecimal("250.00"))
+                .build();
+
+        List<Employee> employeeList = this.employeeCustomRepositoryImplUnderTest.parameterizedQuery("T", new BigDecimal("150"));
+
+        assertNotNull(employeeList);
+        assertEquals(employee1.getName(), employeeList.get(0).getName());
+        assertEquals(employee1.getEmail(), employeeList.get(0).getEmail());
+        assertEquals(employee1.getDob(), employeeList.get(0).getDob());
+        assertEquals(employee1.getSalary(), employeeList.get(0).getSalary());
+        assertEquals(employee2.getName(), employeeList.get(1).getName());
+        assertEquals(employee2.getEmail(), employeeList.get(1).getEmail());
+        assertEquals(employee2.getDob(), employeeList.get(1).getDob());
+        assertEquals(employee2.getSalary(), employeeList.get(1).getSalary());
+    }
+
+    @Test
+    @Order(7)
+    void testParameterizedQueryAnotherWay() {
+        Employee employee1 = Employee.builder()
+                .name("Tan James")
+                .email("james@gmail.com")
+                .dob(LocalDate.of(1995, 1, 1))
+                .salary(new BigDecimal("200.00"))
+                .build();
+
+        Employee employee2 = Employee.builder()
+                .name("Taniya Hil")
+                .email("taniya@gmail.com")
+                .dob(LocalDate.of(1996, 1, 1))
+                .salary(new BigDecimal("250.00"))
+                .build();
+
+        List<Employee> employeeList = this.employeeCustomRepositoryImplUnderTest.parameterizedQueryAnotherWay("T", new BigDecimal("150"));
+
+        assertNotNull(employeeList);
+        assertEquals(employee1.getName(), employeeList.get(0).getName());
+        assertEquals(employee1.getEmail(), employeeList.get(0).getEmail());
+        assertEquals(employee1.getDob(), employeeList.get(0).getDob());
+        assertEquals(employee1.getSalary(), employeeList.get(0).getSalary());
+        assertEquals(employee2.getName(), employeeList.get(1).getName());
+        assertEquals(employee2.getEmail(), employeeList.get(1).getEmail());
+        assertEquals(employee2.getDob(), employeeList.get(1).getDob());
+        assertEquals(employee2.getSalary(), employeeList.get(1).getSalary());
     }
 }

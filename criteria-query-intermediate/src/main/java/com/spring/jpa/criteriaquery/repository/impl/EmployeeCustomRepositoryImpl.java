@@ -11,10 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Tuple;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -62,7 +65,7 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
         tupleQuery.multiselect(employeeRoot, partnerRoot);
 
         Predicate employeePredicate = criteriaBuilder.and(
-                criteriaBuilder.equal(employeeRoot.get("name"), "James"),
+                criteriaBuilder.equal(employeeRoot.get("name"), "Tan James"),
                 criteriaBuilder.isNotEmpty(employeeRoot.get("phones")));
 
         Predicate partnerPredicate = criteriaBuilder.and(
@@ -116,6 +119,42 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
         root.fetch("employee");
         root.fetch("calls");
         criteriaQuery.where(criteriaBuilder.isNotEmpty(root.get("calls")));
+
+        return this.entityManager.createQuery(criteriaQuery).getResultList();
+    }
+
+    @Override
+    public List<Employee> parameterizedQuery(String name, BigDecimal salary) {
+        CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<Employee> criteriaQuery = criteriaBuilder.createQuery(Employee.class);
+        Root<Employee> root = criteriaQuery.from(Employee.class);
+
+        ParameterExpression<String> nameParameter = criteriaBuilder.parameter(String.class);
+        ParameterExpression<BigDecimal> salaryParameter = criteriaBuilder.parameter(BigDecimal.class);
+
+        criteriaQuery.where(
+                criteriaBuilder.like(root.get("name"), nameParameter),
+                criteriaBuilder.greaterThan(root.get("salary"), salaryParameter)
+        );
+
+        TypedQuery<Employee> query = this.entityManager.createQuery(criteriaQuery)
+            .setParameter(nameParameter, name + "%")
+            .setParameter(salaryParameter, salary);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Employee> parameterizedQueryAnotherWay(String name, BigDecimal salary) {
+        CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<Employee> criteriaQuery = criteriaBuilder.createQuery(Employee.class);
+        Root<Employee> root = criteriaQuery.from(Employee.class);
+
+        Predicate employeePredicate = criteriaBuilder.and(
+                criteriaBuilder.like(root.get("name"), "%" + name + "%"),
+                criteriaBuilder.greaterThan(root.get("salary"), salary)
+        );
+        criteriaQuery.where(criteriaBuilder.and(employeePredicate));
 
         return this.entityManager.createQuery(criteriaQuery).getResultList();
     }
