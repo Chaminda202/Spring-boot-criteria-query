@@ -1,5 +1,6 @@
 package com.spring.jpa.criteriaquery.repository;
 
+import com.spring.jpa.criteriaquery.model.EmployeeSummaryDTO;
 import com.spring.jpa.criteriaquery.model.MultipleEntity;
 import com.spring.jpa.criteriaquery.model.entity.Employee;
 import com.spring.jpa.criteriaquery.model.entity.Phone;
@@ -25,6 +26,8 @@ public interface EmployeeCustomRepository {
 
     List<Phone> joinQuery();
 
+    List<Phone> joinQueryAnotherWay();
+
     /***
      * Eager fetching record when they mapping with OneToMany or ManyToOne
      * @return
@@ -40,4 +43,22 @@ public interface EmployeeCustomRepository {
     List<Employee> parameterizedQuery(String name, BigDecimal salary);
 
     List<Employee> parameterizedQueryAnotherWay(String name, BigDecimal salary);
+
+    /***
+     * find the total number of employee using aggregate function
+     * @return Long
+     */
+    Long totalNumberOfEmployee();
+
+    /***
+     * find the max salary of employee using aggregate function
+     * @return BigDecimal
+     */
+    BigDecimal findMaxSalaryOfEmployee();
+
+    /***
+     * Find multiple aggregation function out put
+     * @return EmployeeSummaryDTO
+     */
+    EmployeeSummaryDTO getEmployeesSummary();
 }

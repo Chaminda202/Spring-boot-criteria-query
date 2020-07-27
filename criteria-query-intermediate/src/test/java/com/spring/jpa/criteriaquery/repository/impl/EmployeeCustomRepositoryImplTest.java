@@ -1,6 +1,7 @@
 package com.spring.jpa.criteriaquery.repository.impl;
 
 import com.spring.jpa.criteriaquery.enumeration.PhoneType;
+import com.spring.jpa.criteriaquery.model.EmployeeSummaryDTO;
 import com.spring.jpa.criteriaquery.model.MultipleEntity;
 import com.spring.jpa.criteriaquery.model.entity.Call;
 import com.spring.jpa.criteriaquery.model.entity.Employee;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -239,6 +241,44 @@ class EmployeeCustomRepositoryImplTest {
 
     @Test
     @Order(5)
+    void testJoinQueryAnotherWay() {
+        Employee employee = Employee.builder()
+                .name("Tan James")
+                .email("james@gmail.com")
+                .dob(LocalDate.of(1995, 1, 1))
+                .salary(new BigDecimal("200.00"))
+                .build();
+
+        Phone phone1 = Phone.builder()
+                .number("+94717345623")
+                .phoneType(PhoneType.MOBILE)
+                .build();
+
+        Phone phone2 = Phone.builder()
+                .number("+94113456789")
+                .phoneType(PhoneType.LAND_LINE)
+                .build();
+
+        List<Phone> phoneList = this.employeeCustomRepositoryImplUnderTest.joinQueryAnotherWay();
+
+        assertNotNull(phoneList);
+        assertEquals(phone1.getNumber(), phoneList.get(0).getNumber());
+        assertEquals(phone1.getPhoneType(), phoneList.get(0).getPhoneType());
+        assertEquals(employee.getName(), phoneList.get(0).getEmployee().getName());
+        assertEquals(employee.getEmail(), phoneList.get(0).getEmployee().getEmail());
+        assertEquals(employee.getDob(), phoneList.get(0).getEmployee().getDob());
+        assertEquals(employee.getSalary(), phoneList.get(0).getEmployee().getSalary());
+
+        assertEquals(phone2.getNumber(), phoneList.get(1).getNumber());
+        assertEquals(phone2.getPhoneType(), phoneList.get(1).getPhoneType());
+        assertEquals(employee.getName(), phoneList.get(1).getEmployee().getName());
+        assertEquals(employee.getEmail(), phoneList.get(1).getEmployee().getEmail());
+        assertEquals(employee.getDob(), phoneList.get(1).getEmployee().getDob());
+        assertEquals(employee.getSalary(), phoneList.get(1).getEmployee().getSalary());
+    }
+
+    @Test
+    @Order(6)
     void testEagerFetchInQuery() {
         Employee employee = Employee.builder()
                 .name("Tan James")
@@ -281,7 +321,7 @@ class EmployeeCustomRepositoryImplTest {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     void testParameterizedQuery() {
         Employee employee1 = Employee.builder()
                 .name("Tan James")
@@ -311,7 +351,7 @@ class EmployeeCustomRepositoryImplTest {
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     void testParameterizedQueryAnotherWay() {
         Employee employee1 = Employee.builder()
                 .name("Tan James")
@@ -338,5 +378,37 @@ class EmployeeCustomRepositoryImplTest {
         assertEquals(employee2.getEmail(), employeeList.get(1).getEmail());
         assertEquals(employee2.getDob(), employeeList.get(1).getDob());
         assertEquals(employee2.getSalary(), employeeList.get(1).getSalary());
+    }
+
+    @Test
+    @Order(9)
+    void testTotalNumberOfEmployee() {
+        Long actualResult = this.employeeCustomRepositoryImplUnderTest.totalNumberOfEmployee();
+        assertEquals(2, actualResult);
+    }
+
+    @Test
+    @Order(10)
+    void testFindMaxSalaryOfEmployee() {
+        BigDecimal actualResult = this.employeeCustomRepositoryImplUnderTest.findMaxSalaryOfEmployee();
+        assertEquals(new BigDecimal("250.00"), actualResult);
+    }
+
+    @Test
+    @Order(11)
+    void testGetEmployeesSummary() {
+        EmployeeSummaryDTO expectedResult = EmployeeSummaryDTO.builder()
+                .totalCountOfEmployees(2L)
+                .totalDistinctCountOfEmployees(2L)
+                .sumSalaryOfEmployees(new BigDecimal("450.00"))
+                .averageSalaryOfEmployees(225.0)
+                .maxSalaryOfEmployees(new BigDecimal("250.00"))
+                .build();
+        EmployeeSummaryDTO actualResult = this.employeeCustomRepositoryImplUnderTest.getEmployeesSummary();
+        assertEquals(expectedResult.getTotalCountOfEmployees(), actualResult.getTotalCountOfEmployees());
+        assertEquals(expectedResult.getTotalDistinctCountOfEmployees(), actualResult.getTotalDistinctCountOfEmployees());
+        assertEquals(expectedResult.getSumSalaryOfEmployees(), actualResult.getSumSalaryOfEmployees());
+        assertEquals(expectedResult.getAverageSalaryOfEmployees(), actualResult.getAverageSalaryOfEmployees());
+        assertEquals(expectedResult.getMaxSalaryOfEmployees(), actualResult.getMaxSalaryOfEmployees());
     }
 }

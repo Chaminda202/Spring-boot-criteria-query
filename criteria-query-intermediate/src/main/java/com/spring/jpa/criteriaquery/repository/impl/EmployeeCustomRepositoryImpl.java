@@ -1,5 +1,6 @@
 package com.spring.jpa.criteriaquery.repository.impl;
 
+import com.spring.jpa.criteriaquery.model.EmployeeSummaryDTO;
 import com.spring.jpa.criteriaquery.model.MultipleEntity;
 import com.spring.jpa.criteriaquery.model.entity.Employee;
 import com.spring.jpa.criteriaquery.model.entity.Partner;
@@ -14,6 +15,7 @@ import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -111,6 +113,25 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
     }
 
     @Override
+    public List<Phone> joinQueryAnotherWay() {
+        CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<Object[]> criteriaQuery = criteriaBuilder.createQuery(Object[].class);
+        Root<Phone> rootPhone = criteriaQuery.from(Phone.class);
+        Root<Employee> rootEmployee = criteriaQuery.from(Employee.class);
+        criteriaQuery.multiselect(rootPhone, rootEmployee);
+
+        criteriaQuery.where(criteriaBuilder.equal(rootPhone.get("employee"), rootEmployee.get("id")));
+        return this.entityManager.createQuery(criteriaQuery).getResultList().stream()
+                .map(objects -> {
+                    Phone phone = (Phone) objects[0];
+                    Employee employee = (Employee) objects[1];
+                    phone.setEmployee(employee);
+                    return phone;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<Phone> eagerFetchInQuery() {
         CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<Phone> criteriaQuery = criteriaBuilder.createQuery(Phone.class);
@@ -157,5 +178,43 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
         criteriaQuery.where(criteriaBuilder.and(employeePredicate));
 
         return this.entityManager.createQuery(criteriaQuery).getResultList();
+    }
+
+    @Override
+    public Long totalNumberOfEmployee() {
+        CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+        Root<Employee> root = criteriaQuery.from(Employee.class);
+        criteriaQuery.select(criteriaBuilder.count(root));
+        return this.entityManager.createQuery(criteriaQuery).getSingleResult();
+    }
+
+    @Override
+    public BigDecimal findMaxSalaryOfEmployee() {
+        CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<BigDecimal> criteriaQuery = criteriaBuilder.createQuery(BigDecimal.class);
+        Root<Employee> root = criteriaQuery.from(Employee.class);
+        criteriaQuery.select(criteriaBuilder.max(root.get("salary")));
+        return this.entityManager.createQuery(criteriaQuery).getSingleResult();
+    }
+
+    @Override
+    public EmployeeSummaryDTO getEmployeesSummary() {
+        CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<EmployeeSummaryDTO> criteriaQuery = criteriaBuilder.createQuery(EmployeeSummaryDTO.class);
+        Root<Employee> root = criteriaQuery.from(Employee.class);
+
+
+        Expression<Long> totalCount = criteriaBuilder.count(root);
+        Expression<Long> totalDistinctCount = criteriaBuilder.countDistinct(root);
+        Expression<BigDecimal> sumOfSalary = criteriaBuilder.sum(root.get("salary"));
+        Expression<Double> averageSalary = criteriaBuilder.avg(root.get("salary"));
+        Expression<BigDecimal> maxSalary = criteriaBuilder.max(root.get("salary"));
+
+        criteriaQuery.select(criteriaBuilder.construct(EmployeeSummaryDTO.class,
+                totalCount, totalDistinctCount,
+                sumOfSalary, averageSalary, maxSalary));
+
+        return this.entityManager.createQuery(criteriaQuery).getSingleResult();
     }
 }
