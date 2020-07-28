@@ -35,6 +35,8 @@ public class Phone {
     @JoinColumn(name = "emp_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Employee employee;
-    @OneToMany(mappedBy = "phone", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "phone", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Call> calls = new ArrayList<>();
+    @Transient
+    private Long count; // this filed add for assign the count in group by query
 }

@@ -1,5 +1,6 @@
 package com.spring.jpa.criteriaquery.repository.impl;
 
+import com.spring.jpa.criteriaquery.enumeration.PhoneType;
 import com.spring.jpa.criteriaquery.model.EmployeeSummaryDTO;
 import com.spring.jpa.criteriaquery.model.MultipleEntity;
 import com.spring.jpa.criteriaquery.model.entity.Employee;
@@ -216,5 +217,37 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                 sumOfSalary, averageSalary, maxSalary));
 
         return this.entityManager.createQuery(criteriaQuery).getSingleResult();
+    }
+
+    @Override
+    public List<Phone> groupByPhoneDetails() {
+        CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<Object[]> criteriaQuery = criteriaBuilder.createQuery(Object[].class);
+        Root<Phone> root = criteriaQuery.from(Phone.class);
+
+        criteriaQuery.multiselect(criteriaBuilder.count(root.get("phoneType")), root.get("phoneType"), root.get("employee"));
+        criteriaQuery.groupBy(root.get("employee"));
+        criteriaQuery.having(criteriaBuilder.equal(root.get("phoneType"), PhoneType.MOBILE));
+
+        return this.entityManager.createQuery(criteriaQuery).getResultList().stream()
+                .map(object -> {
+                    Employee employee = (Employee) object[2];
+                    Phone phone = Phone.builder()
+                            .count((Long) object[0])
+                            .phoneType((PhoneType) object[1])
+                            .employee(employee)
+                            .build();
+                    return phone;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Employee> orderByEmployeeDetails() {
+        CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<Employee> criteriaQuery = criteriaBuilder.createQuery(Employee.class);
+        Root<Employee> root = criteriaQuery.from(Employee.class);
+        criteriaQuery.orderBy(criteriaBuilder.desc(root.get("salary")));
+        return this.entityManager.createQuery(criteriaQuery).getResultList();
     }
 }

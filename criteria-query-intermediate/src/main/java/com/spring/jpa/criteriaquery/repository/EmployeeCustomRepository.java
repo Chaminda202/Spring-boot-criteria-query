@@ -61,4 +61,16 @@ public interface EmployeeCustomRepository {
      * @return EmployeeSummaryDTO
      */
     EmployeeSummaryDTO getEmployeesSummary();
+
+    /***
+     * Select the phone details group by employee (Using GroupBy and Having in criteria query)
+     * @return List<Phone>
+     */
+    List<Phone> groupByPhoneDetails();
+
+    /***
+     * Order by employee details using salary (OrderBy- ASC/DESC)
+     * @return List<Employee>
+     */
+    List<Employee> orderByEmployeeDetails();
 }

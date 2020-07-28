@@ -411,4 +411,57 @@ class EmployeeCustomRepositoryImplTest {
         assertEquals(expectedResult.getAverageSalaryOfEmployees(), actualResult.getAverageSalaryOfEmployees());
         assertEquals(expectedResult.getMaxSalaryOfEmployees(), actualResult.getMaxSalaryOfEmployees());
     }
+
+    @Test
+    @Order(11)
+    void testGroupByPhoneDetails() {
+        Employee employee = Employee.builder()
+                .name("Tan James")
+                .email("james@gmail.com")
+                .dob(LocalDate.of(1995, 1, 1))
+                .salary(new BigDecimal("200.00"))
+                .build();
+
+        List<Phone> phoneList = this.employeeCustomRepositoryImplUnderTest.groupByPhoneDetails();
+
+        assertNotNull(phoneList);
+        assertEquals(2, phoneList.get(0).getCount());
+        assertEquals(PhoneType.MOBILE, phoneList.get(0).getPhoneType());
+        assertEquals(employee.getName(), phoneList.get(0).getEmployee().getName());
+        assertEquals(employee.getEmail(), phoneList.get(0).getEmployee().getEmail());
+        assertEquals(employee.getDob(), phoneList.get(0).getEmployee().getDob());
+        assertEquals(employee.getSalary(), phoneList.get(0).getEmployee().getSalary());
+        assertEquals(1, phoneList.get(1).getCount());
+        assertEquals(PhoneType.MOBILE, phoneList.get(1).getPhoneType());
+    }
+
+    @Test
+    @Order(12)
+    void testOrderByEmployeeDetails() {
+        Employee employee1 = Employee.builder()
+                .name("Tan James")
+                .email("james@gmail.com")
+                .dob(LocalDate.of(1995, 1, 1))
+                .salary(new BigDecimal("200.00"))
+                .build();
+
+        Employee employee2 = Employee.builder()
+                .name("Taniya Hil")
+                .email("taniya@gmail.com")
+                .dob(LocalDate.of(1996, 1, 1))
+                .salary(new BigDecimal("250.00"))
+                .build();
+
+        List<Employee> employeeList = this.employeeCustomRepositoryImplUnderTest.orderByEmployeeDetails();
+        assertNotNull(employeeList);
+        assertEquals(employee2.getName(), employeeList.get(0).getName());
+        assertEquals(employee2.getEmail(), employeeList.get(0).getEmail());
+        assertEquals(employee2.getDob(), employeeList.get(0).getDob());
+        assertEquals(employee2.getSalary(), employeeList.get(0).getSalary());
+
+        assertEquals(employee1.getName(), employeeList.get(1).getName());
+        assertEquals(employee1.getEmail(), employeeList.get(1).getEmail());
+        assertEquals(employee1.getDob(), employeeList.get(1).getDob());
+        assertEquals(employee1.getSalary(), employeeList.get(1).getSalary());
+    }
 }
