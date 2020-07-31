@@ -5,10 +5,10 @@ import lombok.Data;
 
 @Data
 @Builder
-public class UserSearchDTO {
+public class AddressSearchDTO {
+    private String street;
+    private String city;
     private String email;
     private String firstName;
     private String lastName;
-    private String street;
-    private String city;
 }
