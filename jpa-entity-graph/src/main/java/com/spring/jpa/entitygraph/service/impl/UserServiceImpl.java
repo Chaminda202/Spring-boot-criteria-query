@@ -86,4 +86,14 @@ public class UserServiceImpl implements UserService {
     public List<User> findAllUserWithPhoneAndCallCriteriaAPI() {
         return this.userRepository.findAllWithCriteriaAPI(USER_WITH_PHONE_AND_CALL_NODE);
     }
+
+    @Override
+    public User findByIdEntityGraphAnnotation(Long id) {
+        return this.userRepository.findById(id).orElseGet(User::new);
+    }
+
+    @Override
+    public List<User> findAllEntityGraphAnnotation() {
+        return this.userRepository.findAll();
+    }
 }

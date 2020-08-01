@@ -18,4 +18,6 @@ public interface UserService {
     User findUserWithPhoneAndCallByIdCriteriaAPI(Long id);
     List<User> findAllUserWithPhoneCriteriaAPI();
     List<User> findAllUserWithPhoneAndCallCriteriaAPI();
+    User findByIdEntityGraphAnnotation(Long id); //override the spring JPA findById() method using entity graph annotation [@EntityGraph]
+    List<User> findAllEntityGraphAnnotation(); //override the spring JPA findById() method using entity graph annotation [@EntityGraph]
 }
