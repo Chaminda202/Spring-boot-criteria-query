@@ -15,8 +15,14 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private UserSpecifications userSpecifications;
+
     @Override
-    public List<User> findAllBySearchableFields(UserSearchDTO userSearchDTO) {
-        return this.userRepository.findAll(this.userSpecifications.filterUserDetails(userSearchDTO));
+    public List<User> filterUserAndAddressDetailsRetrieveAll(UserSearchDTO userSearchDTO) {
+        return this.userRepository.findAll(this.userSpecifications.filterUserAndAddressDetails(userSearchDTO));
+    }
+
+    @Override
+    public List<User> filterUserAndAddressDetailsRetrieveUser(UserSearchDTO userSearchDTO) {
+        return this.userRepository.findAll(this.userSpecifications.filterUserAndAddressDetailsRetrieveUser(userSearchDTO));
     }
 }

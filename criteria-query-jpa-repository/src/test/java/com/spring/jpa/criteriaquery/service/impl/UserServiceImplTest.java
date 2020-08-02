@@ -22,11 +22,28 @@ public class UserServiceImplTest {
 
     @Test
     @Order(1)
-    void testFindAllBySearchableFields(){
+    void testFilterUserAndAddressDetailsRetrieveUser() {
         UserSearchDTO userSearchDTO = UserSearchDTO.builder()
-                .city("Buda")
+                .firstName("John")
+                .city("Budapest")
+                .street("East Sturbridge Garth")
                 .build();
-        List<User> userList = this.userService.findAllBySearchableFields(userSearchDTO);
+        List<User> userList = this.userService.filterUserAndAddressDetailsRetrieveUser(userSearchDTO);
         assertNotNull(userList);
+    }
+
+    @Test
+    @Order(2)
+    void testFilterUserAndAddressDetailsRetrieveAll() {
+        UserSearchDTO userSearchDTO = UserSearchDTO.builder()
+                .firstName("John")
+                .city("Budapest")
+                .street("East Sturbridge Garth")
+                .build();
+        List<User> userList = this.userService.filterUserAndAddressDetailsRetrieveAll(userSearchDTO);
+        assertNotNull(userList);
+        userList.forEach(user -> {
+            assertNotNull(user.getAddresses());
+        });
     }
 }

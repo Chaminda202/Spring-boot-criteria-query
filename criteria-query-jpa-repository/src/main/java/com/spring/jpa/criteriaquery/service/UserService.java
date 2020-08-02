@@ -6,5 +6,6 @@ import com.spring.jpa.criteriaquery.model.entity.User;
 import java.util.List;
 
 public interface UserService {
-    List<User> findAllBySearchableFields(UserSearchDTO userSearchDTO);
+    List<User> filterUserAndAddressDetailsRetrieveAll(UserSearchDTO userSearchDTO);
+    List<User> filterUserAndAddressDetailsRetrieveUser(UserSearchDTO userSearchDTO);
 }
